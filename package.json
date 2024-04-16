@@ -1,0 +1,22 @@
+{
+  "name": "buteelt",
+  "version": "1.0.0",
+  "description": "buteelt3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Huranu/Buteelt3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Huranu/Buteelt3/issues"
+  },
+  "homepage": "https://github.com/Huranu/Buteelt3#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
