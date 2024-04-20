@@ -142,6 +142,7 @@ exports.createEmployee = asyncHandler(async (req, res, next) => {
   
     if (req.query) {
       Query.where.server_id=Number(req.params.id);
+      Query.where.employee=req.query;
     }
     if (sort) {
       Query.order = sort
@@ -157,7 +158,7 @@ exports.createEmployee = asyncHandler(async (req, res, next) => {
     const formattedEmps = employees.map((item) => item.employee);
     formattedEmps.map(async (e)=>{
 
-    const datat = await prisma.server_emp.findUnique({
+    const datat = await prisma.server_emp.findFirst({
         where:{
             emp_id:e.id,
             server_id:Number(req.params.id)
