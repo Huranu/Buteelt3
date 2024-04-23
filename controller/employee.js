@@ -28,9 +28,6 @@ exports.createEmployee = asyncHandler(async (req, res, next) => {
   });
 
   exports.getServerEmployees = asyncHandler(async (req, res, next) => {
-    const sort = req.query.sort;
-  
-    ["sort"].forEach((el) => delete req.query[el]);
   
     let Query = {  };
     Query.where = {};
@@ -40,14 +37,6 @@ exports.createEmployee = asyncHandler(async (req, res, next) => {
     if (req.query) {
       Query.where.server_id=Number(req.params.id);
       Query.where.employee=req.query;
-    }
-    if (sort) {
-      Query.order = sort
-        .split(" ")
-        .map((el) => [
-          el.charAt(0) === "-" ? el.substring(1) : el,
-          el.charAt(0) === "-" ? "DESC" : "ASC",
-        ]);
     }
     Query.select.employee=true
     const employees = await prisma.server_emp.findMany(Query);
@@ -131,10 +120,9 @@ exports.createEmployee = asyncHandler(async (req, res, next) => {
   });
 
   exports.transfer = asyncHandler(async (req, res, next) => {
-    const sort = req.query.sort;
   
-    ["sort"].forEach((el) => delete req.query[el]);
-  
+    const { server_id } = req.body;
+
     let Query = { };
     Query.where = { };
     Query.select = { };
@@ -144,16 +132,7 @@ exports.createEmployee = asyncHandler(async (req, res, next) => {
       Query.where.server_id=Number(req.params.id);
       Query.where.employee=req.query;
     }
-    if (sort) {
-      Query.order = sort
-        .split(" ")
-        .map((el) => [
-          el.charAt(0) === "-" ? el.substring(1) : el,
-          el.charAt(0) === "-" ? "DESC" : "ASC",
-        ]);
-    }
     Query.select.employee=true
-    const { server_id } = req.body;
     const employees = await prisma.server_emp.findMany(Query);
     const formattedEmps = employees.map((item) => item.employee);
     formattedEmps.map(async (e)=>{
@@ -177,6 +156,50 @@ exports.createEmployee = asyncHandler(async (req, res, next) => {
         }
     });
     })
+    res.status(200).json({
+        success: true,
+        data: employees,
+    });
+  });
+
+  exports.transferAndSave = asyncHandler(async (req, res, next) => {
+  
+    const { server_id } = req.body;
+
+    let Query = { };
+    Query.where = { };
+    Query.select = { };
+    Query.where.server_id=Number(req.params.id);
+  
+    if (req.query) {
+      Query.where.server_id=Number(req.params.id);
+      Query.where.employee=req.query;
+    }
+    Query.select.employee=true
+    const employees = await prisma.server_emp.findMany(Query);
+    const formattedEmps = employees.map((item) => item.employee);
+    formattedEmps.map(async (e)=>{
+
+    const datat = await prisma.server_emp.findFirst({
+        where:{
+            emp_id:e.id,
+            server_id:Number(req.params.id)
+          },
+    });
+    const created = await prisma.server_emp.create({
+        data:{
+            emp_id:e.id,
+            server_id
+        }
+    });
+    })
+
+    const result = await prisma.server_emp.deleteMany({
+      where:{
+        server_id:Number(req.params.id)
+      }
+    });
+
     res.status(200).json({
         success: true,
         data: employees,
